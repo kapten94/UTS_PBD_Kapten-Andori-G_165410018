@@ -1,0 +1,43 @@
+1. 3 DBMS yang bisa digunakan untuk mengelola big data :
+    a. MongoDB
+    b. MySQL
+    c. CouchDB
+
+2. Instalasi dan CRUD MongoDB pada php
+    a. Insert collection
+       db.collection.insert()
+       //contoh penggunaan
+       db.user.insert(
+         [
+          { username: "nanda",
+            password: "password",
+            email : "nanda@gmail.com",
+          }
+         ]
+       )
+    b. Update collection
+       db.collection.update(query, update, options)
+       //contoh penggunaan
+       db.user.update(
+         { username: "nanda" },
+         { username: "putra",
+           password: "password",
+           email : "putra@gmail.com", },
+         { upsert: true }
+       )
+    c. Search collection
+       db.collection.find(query, projection)
+       //contoh penggunaan
+       //cari seluruh data
+       db.user.find({})
+       //cari data berdsarkan id
+       db.user.find({
+         '_id':ObjectId('58cf7c259cf34592b2bc00c0')
+       }
+       )
+    d. Delete collection
+       db.collection.remove()
+       //contoh penggunaan
+       db.user.remove(
+         { username: "putra" }
+       )
