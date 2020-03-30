@@ -3,41 +3,75 @@
     b. MySQL
     c. CouchDB
 
-2. Instalasi dan CRUD MongoDB pada php
-    a. Insert collection
-       db.collection.insert()
-       //contoh penggunaan
-       db.user.insert(
-         [
-          { username: "nanda",
-            password: "password",
-            email : "nanda@gmail.com",
-          }
-         ]
-       )
-    b. Update collection
-       db.collection.update(query, update, options)
-       //contoh penggunaan
-       db.user.update(
-         { username: "nanda" },
-         { username: "putra",
-           password: "password",
-           email : "putra@gmail.com", },
-         { upsert: true }
-       )
-    c. Search collection
-       db.collection.find(query, projection)
-       //contoh penggunaan
-       //cari seluruh data
-       db.user.find({})
-       //cari data berdsarkan id
-       db.user.find({
-         '_id':ObjectId('58cf7c259cf34592b2bc00c0')
-       }
-       )
+2. Instalasi dan CRUD MongoDB dengan php untuk membuat blog sederhana
+    a. Melakukan Config
+       <?php    
+         //mongo connection
+         $connection=new Mongo();
+         $db= $connection->selectDB('Blogdb');
+     
+         //collection Blogdb
+         $blog = $connection->Blogdb->artikel;
+       ?>
+
+    b. Melakukan Add
+       <html>
+         <head></head>
+         <body>
+           <h1>Tambah Artikel</h1>
+           <form action="add_artikel.php" method="POST">
+             <label>Judul</label> : <input type="text" name="judul"/><br/>
+             <label>Artikel</label> : <textarea name="isi" cols='20' rows='10'></textarea><br/>
+             <input type='submit' value='Post'/>
+           </form>
+         </body>
+       </html>
+       <?php
+         include('config.php');
+         if(!empty($_POST)){
+            $date=date('d/F/Y');
+            $judul=$_POST['judul'];
+            $isi=$_POST['isi'];
+            $new_artikel= array('judul'=>$judul,'isi'=>$isi,'coments'=>'','tanggal'=>$date);
+            $blog->insert($new_artikel);
+            header('Location: http://10.2.2.234/ngulik/blogmongodb/list_artikel.php');
+         }
+       ?>
+
+    c. Update collection
+       <html>
+         <head></head>
+         <body>
+           <?php
+             include('config.php');
+             $id= new MongoId($_GET['id']);
+             $detil=$blog->findOne(array('_id'=>$id));
+     
+           ?>
+             <h1>Edit Artikel</h1>
+             <form action="edit_artikel.php" method="POST">
+               <input type="hidden" name="id" value="<?php echo $_GET['id']?>"/>
+               <label>Judul</label> : <input type="text" name="judul" value="<?php echo $detil['judul']?>"/><br/>
+               <label>Artikel</label> : <textarea name="isi" cols='20' rows='10'><?php echo $detil['isi']?></textarea><br/>
+               <input type='submit' value='Post'/>
+             </form>
+         </body>
+       </html>
+         <?php
+           if(!empty($_POST)){
+             $id=$_POST['id'];
+             $date=date('d/F/Y');
+             $judul=$_POST['judul'];
+             $isi=$_POST['isi'];
+             $blog->update(array( '_id' => new MongoId($id)),array( '$set' => array( 'judul' => $judul,'isi'=>$isi,'tanggal'=>$date)));
+               header('Location: http://10.2.2.234/ngulik/blogmongodb/list_artikel.php');
+           }
+         ?>
+
     d. Delete collection
-       db.collection.remove()
-       //contoh penggunaan
-       db.user.remove(
-         { username: "putra" }
-       )
+       <?php
+         include('config.php');
+         $criteria = array('_id'=> new MongoId($_GET['id']));
+         $blog->remove($criteria);
+         header('Location: http://10.2.2.234/ngulik/blogmongodb/list_artikel.php');
+       ?>
